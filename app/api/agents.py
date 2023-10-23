@@ -49,15 +49,13 @@ async def create_agent(body: Agent, token=Depends(JWTBearer())):
 async def read_agents(token=Depends(JWTBearer())):
     """Agents endpoint"""
     decoded = decodeJWT(token)
-    agents = prisma.agent.find_many(
+    if agents := prisma.agent.find_many(
         where={"userId": decoded["userId"]},
         include={
             "user": True,
         },
         order={"createdAt": "desc"},
-    )
-
-    if agents:
+    ):
         return {"success": True, "data": agents}
 
     raise HTTPException(
@@ -69,9 +67,9 @@ async def read_agents(token=Depends(JWTBearer())):
 @router.get("/agents/{agentId}", name="Get agent", description="Get a specific agent")
 async def read_agent(agentId: str, token=Depends(JWTBearer())):
     """Agent detail endpoint"""
-    agent = prisma.agent.find_unique(where={"id": agentId}, include={"prompt": True})
-
-    if agent:
+    if agent := prisma.agent.find_unique(
+        where={"id": agentId}, include={"prompt": True}
+    ):
         return {"success": True, "data": agent}
 
     raise HTTPException(

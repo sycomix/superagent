@@ -45,8 +45,7 @@ class TextSplitters:
         text_splitter = CharacterTextSplitter(
             chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
         )
-        docs = text_splitter.split_documents(self.documents)
-        return docs
+        return text_splitter.split_documents(self.documents)
 
     def recursive_splitter(self):
         """
@@ -57,8 +56,7 @@ class TextSplitters:
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
         )
-        docs = text_splitter.split_documents(self.documents)
-        return docs
+        return text_splitter.split_documents(self.documents)
 
     def token_splitter(self):
         """
@@ -68,8 +66,7 @@ class TextSplitters:
         text_splitter = TokenTextSplitter(
             chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
         )
-        docs = text_splitter.split_text(self.documents)
-        return docs
+        return text_splitter.split_text(self.documents)
 
     def spacy_splitter(self):
         """
@@ -77,8 +74,7 @@ class TextSplitters:
         """
 
         text_splitter = SpacyTextSplitter(chunk_size=self.chunk_size)
-        docs = text_splitter.split_text(self.documents)
-        return docs
+        return text_splitter.split_text(self.documents)
 
     def nltk_splitter(self):
         """
@@ -86,8 +82,7 @@ class TextSplitters:
         """
 
         text_splitter = NLTKTextSplitter(chunk_size=self.chunk_size)
-        docs = text_splitter.split_text(self.documents)
-        return docs
+        return text_splitter.split_text(self.documents)
 
     def huggingface_splitter(self):
         """
@@ -106,5 +101,4 @@ class TextSplitters:
         text_splitter = CharacterTextSplitter.from_huggingface_tokenizer(
             tokenizer, chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
         )
-        docs = text_splitter.split_text(self.documents)
-        return docs
+        return text_splitter.split_text(self.documents)

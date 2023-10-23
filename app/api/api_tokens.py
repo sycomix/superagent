@@ -39,11 +39,9 @@ async def create_api_token(body: ApiToken, token=Depends(JWTBearer())):
 async def read_api_tokens(token=Depends(JWTBearer())):
     """List api tokens endpoint"""
     decoded = decodeJWT(token)
-    api_tokens = prisma.apitoken.find_many(
+    if api_tokens := prisma.apitoken.find_many(
         where={"userId": decoded["userId"]}, include={"user": True}
-    )
-
-    if api_tokens:
+    ):
         return {"success": True, "data": api_tokens}
 
     raise HTTPException(
@@ -59,11 +57,9 @@ async def read_api_tokens(token=Depends(JWTBearer())):
 )
 async def read_api_token(tokenId: str, token=Depends(JWTBearer())):
     """Get an api token endpoint"""
-    api_token = prisma.apitoken.find_unique(
+    if api_token := prisma.apitoken.find_unique(
         where={"id": tokenId}, include={"user": True}
-    )
-
-    if api_token:
+    ):
         return {"success": True, "data": api_token}
 
     raise HTTPException(

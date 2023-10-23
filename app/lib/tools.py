@@ -16,18 +16,14 @@ class ToolDescription(Enum):
 
 
 def get_search_tool() -> Any:
-    search = BingSearchAPIWrapper(
+    return BingSearchAPIWrapper(
         bing_search_url=config("BING_SEARCH_URL"),
         bing_subscription_key=config("BING_SUBSCRIPTION_KEY"),
     )
 
-    return search
-
 
 def get_wolfram_alpha_tool() -> Any:
-    wolfram = WolframAlphaAPIWrapper()
-
-    return wolfram
+    return WolframAlphaAPIWrapper()
 
 
 def get_replicate_tool(metadata: dict) -> Any:

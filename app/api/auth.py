@@ -15,13 +15,12 @@ router = APIRouter()
 
 @router.post("/auth/sign-in")
 async def sign_in(signIn: SignIn):
-    user = prisma.user.find_first(
+    if user := prisma.user.find_first(
         where={
             "email": signIn.email,
         },
         include={"profile": True},
-    )
-    if user:
+    ):
         validated = validatePassword(signIn.password, user.password)
         del user.password
 
@@ -29,15 +28,10 @@ async def sign_in(signIn: SignIn):
             token = signJWT(user.id)
             return {"success": True, "data": SignInOut(token=token, user=user)}
 
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-        )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-        )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid credentials",
+    )
 
 
 @router.post("/auth/sign-up")

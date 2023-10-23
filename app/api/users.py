@@ -24,9 +24,9 @@ async def read_user_me(token=Depends(JWTBearer())):
 
 @router.get("/users/{userId}")
 async def read_user(userId: str):
-    user = prisma.user.find_unique(where={"id": userId}, include={"profile": True})
-
-    if user:
+    if user := prisma.user.find_unique(
+        where={"id": userId}, include={"profile": True}
+    ):
         return {"success": True, "data": user}
 
     raise HTTPException(

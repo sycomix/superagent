@@ -30,10 +30,14 @@ def upsert_document(
 
     embeddings = OpenAIEmbeddings()
 
-    if type == "TXT":
+    if type == "MARKDOWN":
         file_response = requests.get(url)
-        loader = TextLoader(file_response.content)
-        documents = loader.load()
+        with NamedTemporaryFile(suffix=".md", delete=True) as temp_file:
+            temp_file.write(file_response.text.encode())
+            temp_file.flush()
+            loader = UnstructuredMarkdownLoader(file_path=temp_file.name)
+            documents = loader.load()
+
         newDocuments = [
             document.metadata.update({"namespace": document_id}) or document
             for document in documents
@@ -43,8 +47,7 @@ def upsert_document(
         VectorStoreBase().get_database().from_documents(
             docs, embeddings, index_name="superagent", namespace=document_id
         )
-
-    if type == "PDF":
+    elif type == "PDF":
         loader = CustomPDFPlumberLoader(
             file_path=url, from_page=from_page, to_page=to_page
         )
@@ -59,7 +62,21 @@ def upsert_document(
             docs, embeddings, index_name="superagent", namespace=document_id
         )
 
-    if type == "URL":
+    elif type == "TXT":
+        file_response = requests.get(url)
+        loader = TextLoader(file_response.content)
+        documents = loader.load()
+        newDocuments = [
+            document.metadata.update({"namespace": document_id}) or document
+            for document in documents
+        ]
+        docs = TextSplitters(newDocuments, text_splitter).document_splitter()
+
+        VectorStoreBase().get_database().from_documents(
+            docs, embeddings, index_name="superagent", namespace=document_id
+        )
+
+    elif type == "URL":
         loader = WebBaseLoader(url)
         documents = loader.load()
         newDocuments = [
@@ -73,28 +90,10 @@ def upsert_document(
             docs, embeddings, index_name="superagent", namespace=document_id
         )
 
-    if type == "YOUTUBE":
+    elif type == "YOUTUBE":
         video_id = url.split("youtube.com/watch?v=")[-1]
         loader = YoutubeLoader(video_id=video_id)
         documents = loader.load()
-        newDocuments = [
-            document.metadata.update({"namespace": document_id}) or document
-            for document in documents
-        ]
-        docs = TextSplitters(newDocuments, text_splitter).document_splitter()
-
-        VectorStoreBase().get_database().from_documents(
-            docs, embeddings, index_name="superagent", namespace=document_id
-        )
-
-    if type == "MARKDOWN":
-        file_response = requests.get(url)
-        with NamedTemporaryFile(suffix=".md", delete=True) as temp_file:
-            temp_file.write(file_response.text.encode())
-            temp_file.flush()
-            loader = UnstructuredMarkdownLoader(file_path=temp_file.name)
-            documents = loader.load()
-
         newDocuments = [
             document.metadata.update({"namespace": document_id}) or document
             for document in documents

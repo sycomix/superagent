@@ -50,11 +50,9 @@ async def create_document(body: Document, token=Depends(JWTBearer())):
 async def read_documents(token=Depends(JWTBearer())):
     """List documents endpoint"""
     decoded = decodeJWT(token)
-    documents = prisma.document.find_many(
+    if documents := prisma.document.find_many(
         where={"userId": decoded["userId"]}, include={"user": True}
-    )
-
-    if documents:
+    ):
         return {"success": True, "data": documents}
 
     raise HTTPException(
@@ -70,11 +68,9 @@ async def read_documents(token=Depends(JWTBearer())):
 )
 async def read_document(documentId: str, token=Depends(JWTBearer())):
     """Get a single document"""
-    document = prisma.document.find_unique(
+    if document := prisma.document.find_unique(
         where={"id": documentId}, include={"user": True}
-    )
-
-    if document:
+    ):
         return {"success": True, "data": document}
 
     raise HTTPException(

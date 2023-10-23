@@ -62,7 +62,7 @@ class AgentBase:
         self.tools = self._get_agent_tools()
 
     def _get_api_key(self) -> str:
-        if self.llm["provider"] == "openai-chat" or self.llm["provider"] == "openai":
+        if self.llm["provider"] in ["openai-chat", "openai"]:
             return (
                 self.llm["api_key"]
                 if "api_key" in self.llm
@@ -268,11 +268,9 @@ class AgentBase:
         return ConversationBufferMemory(memory_key="chat_history", output_key="output")
 
     def _get_agent_documents(self) -> Any:
-        agent_documents = prisma.agentdocument.find_many(
+        return prisma.agentdocument.find_many(
             where={"agentId": self.id}, include={"document": True}
         )
-
-        return agent_documents
 
     def _get_tool_and_input_by_type(
         self, type: str, metadata: dict = None
@@ -327,11 +325,9 @@ class AgentBase:
         return tools
 
     def _get_agent_tools(self) -> Any:
-        tools = prisma.agenttool.find_many(
+        return prisma.agenttool.find_many(
             where={"agentId": self.id}, include={"tool": True}
         )
-
-        return tools
 
     def _format_trace(self, trace: Any) -> dict:
         if self.documents or self.tools:
